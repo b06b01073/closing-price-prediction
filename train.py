@@ -37,7 +37,7 @@ def main(args):
             torch.save(stock_net.state_dict(), utils.get_path(f'./model_params/{args.ticker}.pth'))
 
             features = test_set.fetch_data(-1)
-            features = [features.high_low_diff, features.close_open_diff, features.MAs.MA_7d, features.MAs.MA_14d, features.MAs.MA_21d, features.std, features.close]
+            features = [features.high_low_diff, features.close_open_diff, features.std, features.MAs.MA_7d, features.MAs.MA_14d, features.MAs.MA_21d,  features.close]
 
             features = torch.from_numpy(np.stack(features, axis=0)).unsqueeze(0).float().to(device)
 
