@@ -3,18 +3,20 @@ import pandas as pd
 import os
 from dataset import StockDataset
 
-def get_dataset(ticker, MA_intervals, std_interval, download, drop_head):
-    path = get_path(f'./data/{ticker}.csv')
+def get_dataset(ticker, interval, MA_intervals, std_interval, download, drop_head, start, end, train_set):
+    dataset_type = 'train' if train_set else 'test'
+    path = f'data/{ticker}_{dataset_type}_{start}_{end}.csv'
+    path = get_path(path)
 
     if os.path.exists(path) and not download:
         dataset = pd.read_csv(path)
     else:
-        dataset = yf.download(tickers=ticker, period='5y', interval='1d')
+        dataset = yf.download(tickers=ticker, start=start, end=end, interval=interval)
         insert_MAs(dataset, MA_intervals)
         insert_std(dataset, std_interval)
+        dataset.to_csv(path)    
 
-        dataset = dataset.iloc[drop_head-1:] 
-        dataset.to_csv(path, index=False)    
+    dataset = dataset.iloc[drop_head-1:] 
 
     dataset = StockDataset(dataset, MA_intervals, std_interval)
 
@@ -34,3 +36,4 @@ def get_path(path):
     dir_path = os.path.dirname(__file__) 
     path = os.path.join(dir_path, path)
     return path
+
