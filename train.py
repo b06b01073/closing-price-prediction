@@ -22,14 +22,17 @@ def main(args):
 
 
     stock_net = model.StockNet(in_features=args.in_features, out_features=args.out_features).to(device)
-    optimizer = optim.RMSprop(stock_net.parameters(), lr=args.lr)
+    optimizer = optim.RMSprop(stock_net.parameters(), lr=args.lr, weight_decay=args.weight_decay)
     criterion = nn.MSELoss()
 
     for epoch in range(args.epochs):
         train_loss = train(args, train_loader, stock_net, optimizer, criterion)
-        print(f'epoch: {epoch}, avg_loss: {train_loss * args.batch_size / len(train_set)}')
+        test_loss = test(args, test_loader, stock_net, criterion)
+        error_log(train_loss, test_loss, epoch)
+        
 
-        test(args, test_loader, stock_net)
+def error_log(train_loss, test_loss, epoch):
+    print(f'epoch: {epoch}, train_loss: {train_loss}, test_loss: {test_loss}')
 
 def train(args, train_loader, stock_net, optimizer, criterion):
     total_loss = 0
@@ -39,14 +42,13 @@ def train(args, train_loader, stock_net, optimizer, criterion):
 
         high_low_diffs = features.high_low_diff
         close_open_diffs = features.close_open_diff
-        # MA_7d = features.MAs.MA_7d
-        # MA_14d = features.MAs.MA_14d
-        # MA_21d = features.MAs.MA_21d
-        close = features.close
+        MA_7d = features.MAs.MA_7d
+        MA_14d = features.MAs.MA_14d
+        MA_21d = features.MAs.MA_21d
         std = features.std
-        volume = features.volume
+        close = features.close
 
-        input = torch.stack((high_low_diffs, close_open_diffs, close, std)).float().to(device)
+        input = torch.stack((high_low_diffs, close_open_diffs, std, MA_7d, MA_14d, MA_21d)).float().to(device)
         input = torch.transpose(input, 0, 1)
 
         output = stock_net(input).squeeze()
@@ -60,35 +62,44 @@ def train(args, train_loader, stock_net, optimizer, criterion):
     return total_loss
     
 
-def test(args, test_loader, stock_net):
+def test(args, test_loader, stock_net, criterion):
     predictions = []
     ground_truths = []
+    total_loss = 0
     with torch.no_grad():
         for batch in test_loader:
             features, y = batch
+            y = y.float().to(device)
+
             high_low_diffs = features.high_low_diff
             close_open_diffs = features.close_open_diff
-            # MA_7d = features.MAs.MA_7d
-            # MA_14d = features.MAs.MA_14d
-            # MA_21d = features.MAs.MA_21d
+            MA_7d = features.MAs.MA_7d
+            MA_14d = features.MAs.MA_14d
+            MA_21d = features.MAs.MA_21d
             std = features.std
             close = features.close
-            volume = features.volume
 
-            input = torch.stack((high_low_diffs, close_open_diffs, close, std)).float().to(device)
+            input = torch.stack((high_low_diffs, close_open_diffs, std, MA_7d, MA_14d, MA_21d)).float().to(device)
             input = torch.transpose(input, 0, 1)
-
-
             output = stock_net(input).squeeze()
+
+            total_loss += criterion(output, y)
+
             for prediction in output:
                 predictions.append(prediction.item())
             for truth in y:
-                ground_truths.append(truth)
+                ground_truths.append(truth.to('cpu'))
 
-    plt.plot(predictions, color='blue')
-    plt.plot(ground_truths, color='red')
+    x = [i for i in range(len(predictions))]
+    plt.plot(x, predictions, color='blue', label='pred')
+    plt.plot(x, ground_truths, color='red', label='ground truth')
+    plt.legend(loc='best')
+    plt.ylabel('price')
+    plt.xlabel('time')
     plt.savefig('result.png')
     plt.clf()
+
+    return total_loss
 
 
 
@@ -105,15 +116,16 @@ if __name__ == '__main__':
     parser.add_argument('--training_start', type=str, default='2011-01-01')
     parser.add_argument('--training_end', type=str, default='2020-12-31')
     parser.add_argument('--test_start', type=str, default='2021-01-01')
-    parser.add_argument('--test_end', type=str, default='2023-02-14')
+    parser.add_argument('--test_end', type=str, default='2023-02-16')
 
 
     # training related arguments
     parser.add_argument('--batch_size', '-b', type=int, default=64)
     parser.add_argument('--epochs', '-e', type=int, default=1000)
-    parser.add_argument('--in_features', type=int, default=4)
+    parser.add_argument('--in_features', type=int, default=6)
     parser.add_argument('--out_features', type=int, default=1)
-    parser.add_argument('--lr', type=float, default=1e-2)
+    parser.add_argument('--lr', type=float, default=1e-3)
+    parser.add_argument('--weight_decay', type=float, default=1e-4)
 
     args = parser.parse_args()
     args.MA_intervals = [int(interval) for interval in args.MA_intervals]
