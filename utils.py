@@ -5,7 +5,7 @@ from dataset import StockDataset
 
 def get_dataset(ticker, interval, MA_intervals, std_interval, download, drop_head, start, end, train_set):
     dataset_type = 'train' if train_set else 'test'
-    path = f'data/{ticker}_{dataset_type}_{start}_{end}.csv'
+    path = f'data/{ticker}_{dataset_type}.csv'
     path = get_path(path)
 
     if os.path.exists(path) and not download:
@@ -18,7 +18,7 @@ def get_dataset(ticker, interval, MA_intervals, std_interval, download, drop_hea
 
     dataset = dataset.iloc[drop_head-1:] 
 
-    dataset = StockDataset(dataset, MA_intervals, std_interval)
+    dataset = StockDataset(dataset, MA_intervals, std_interval, train_set)
 
     return dataset
 
@@ -36,4 +36,3 @@ def get_path(path):
     dir_path = os.path.dirname(__file__) 
     path = os.path.join(dir_path, path)
     return path
-

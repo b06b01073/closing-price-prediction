@@ -6,10 +6,11 @@ from collections import namedtuple
 import numpy as np
 
 class StockDataset(Dataset):
-    def __init__(self, dataset, MA_intervals, std_interval):
+    def __init__(self, dataset, MA_intervals, std_interval, train_set=False):
         self.dataset = dataset 
         self.MA_intervals = MA_intervals
         self.std_interval = std_interval
+        self.train_set = train_set
 
     def fetch_data(self, index):
         row = self.dataset.iloc[index]
@@ -27,20 +28,14 @@ class StockDataset(Dataset):
             MAs = moving_averages,
             std = row[f'std_{self.std_interval}d'],
             volume=row['Volume'],
-            close=self.dataset.iloc[index + 1]['Close']
+            close=self.dataset.iloc[index]['Close']
         )
 
         return stock_data
 
     def __len__(self):
-        return len(self.dataset.index)
+        return len(self.dataset.index) - 1
 
     def __getitem__(self, index):
-
-        # ignore the last data point, since there are no ground truth(the data from the day after that)
-        if index == len(self) - 1:
-            index = np.random.randint(low=0, high=len(self) - 1)
-        
         return self.fetch_data(index), self.dataset.iloc[index + 1]['Close']
-
-    
+        

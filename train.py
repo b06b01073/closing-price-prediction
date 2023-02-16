@@ -5,6 +5,7 @@ import torch
 import model
 from torch import optim
 from torch import nn 
+import numpy as np
 
 import matplotlib.pyplot as plt
 
@@ -17,7 +18,7 @@ def main(args):
     print(f'len of train_set: {len(train_set)}')
     print(f'len of test_set: {len(test_set)}')
 
-    train_loader = DataLoader(train_set, batch_size=args.batch_size, shuffle=True)
+    train_loader = DataLoader(train_set, batch_size=args.batch_size, shuffle=True, drop_last=True)
     test_loader = DataLoader(test_set, batch_size=args.batch_size)
 
 
@@ -25,14 +26,29 @@ def main(args):
     optimizer = optim.RMSprop(stock_net.parameters(), lr=args.lr, weight_decay=args.weight_decay)
     criterion = nn.MSELoss()
 
+    best_loss = float('inf')
+    best_out = None
     for epoch in range(args.epochs):
         train_loss = train(args, train_loader, stock_net, optimizer, criterion)
-        test_loss = test(args, test_loader, stock_net, criterion)
-        error_log(train_loss, test_loss, epoch)
-        
+        test_loss, output = test(args, test_loader, stock_net, criterion)
 
-def error_log(train_loss, test_loss, epoch):
-    print(f'epoch: {epoch}, train_loss: {train_loss}, test_loss: {test_loss}')
+        if test_loss < best_loss:
+            best_loss = test_loss
+            torch.save(stock_net.state_dict(), utils.get_path(f'./model_params/{args.ticker}.pth'))
+
+            features = test_set.fetch_data(-1)
+            features = [features.high_low_diff, features.close_open_diff, features.MAs.MA_7d, features.MAs.MA_14d, features.MAs.MA_21d, features.std, features.close]
+
+            features = torch.from_numpy(np.stack(features, axis=0)).unsqueeze(0).float().to(device)
+
+            with torch.no_grad():
+                best_out = stock_net(features).item()
+
+        
+        error_log(train_loss, test_loss, epoch, best_out)
+
+def error_log(train_loss, test_loss, epoch, best_out):
+    print(f'epoch: {epoch}, train_loss: {train_loss}, test_loss: {test_loss}, best_out: {best_out}')
 
 def train(args, train_loader, stock_net, optimizer, criterion):
     total_loss = 0
@@ -48,12 +64,15 @@ def train(args, train_loader, stock_net, optimizer, criterion):
         std = features.std
         close = features.close
 
-        input = torch.stack((high_low_diffs, close_open_diffs, std, MA_7d, MA_14d, MA_21d)).float().to(device)
+        input = torch.stack((high_low_diffs, close_open_diffs, std, MA_7d, MA_14d, MA_21d, close)).float().to(device)
         input = torch.transpose(input, 0, 1)
 
-        output = stock_net(input).squeeze()
+
+        output = stock_net(input).flatten()
+        
 
         optimizer.zero_grad()
+
         loss = criterion(output, y)
         loss.backward()
         optimizer.step()
@@ -67,7 +86,7 @@ def test(args, test_loader, stock_net, criterion):
     ground_truths = []
     total_loss = 0
     with torch.no_grad():
-        for batch in test_loader:
+        for idx, batch in enumerate(test_loader):
             features, y = batch
             y = y.float().to(device)
 
@@ -79,9 +98,9 @@ def test(args, test_loader, stock_net, criterion):
             std = features.std
             close = features.close
 
-            input = torch.stack((high_low_diffs, close_open_diffs, std, MA_7d, MA_14d, MA_21d)).float().to(device)
+            input = torch.stack((high_low_diffs, close_open_diffs, std, MA_7d, MA_14d, MA_21d, close)).float().to(device)
             input = torch.transpose(input, 0, 1)
-            output = stock_net(input).squeeze()
+            output = stock_net(input).flatten()
 
             total_loss += criterion(output, y)
 
@@ -96,10 +115,10 @@ def test(args, test_loader, stock_net, criterion):
     plt.legend(loc='best')
     plt.ylabel('price')
     plt.xlabel('time')
-    plt.savefig('result.png')
+    plt.savefig(f'{args.ticker}.png')
     plt.clf()
 
-    return total_loss
+    return total_loss, output
 
 
 
@@ -122,7 +141,7 @@ if __name__ == '__main__':
     # training related arguments
     parser.add_argument('--batch_size', '-b', type=int, default=64)
     parser.add_argument('--epochs', '-e', type=int, default=1000)
-    parser.add_argument('--in_features', type=int, default=6)
+    parser.add_argument('--in_features', type=int, default=7)
     parser.add_argument('--out_features', type=int, default=1)
     parser.add_argument('--lr', type=float, default=1e-3)
     parser.add_argument('--weight_decay', type=float, default=1e-4)
