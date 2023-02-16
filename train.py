@@ -28,21 +28,30 @@ def main(args):
 
     best_loss = float('inf')
     best_out = None
+    count = 0
     for epoch in range(args.epochs):
         train_loss = train(args, train_loader, stock_net, optimizer, criterion)
         test_loss, output = test(args, test_loader, stock_net, criterion)
+
+        count += 1
 
         if test_loss < best_loss:
             best_loss = test_loss
             torch.save(stock_net.state_dict(), utils.get_path(f'./model_params/{args.ticker}.pth'))
 
             features = test_set.fetch_data(-1)
-            features = [features.high_low_diff, features.close_open_diff, features.std, features.MAs.MA_7d, features.MAs.MA_14d, features.MAs.MA_21d,  features.close]
+            features = [features.high_low_diff, features.close_open_diff, features.std, features.MAs.MA_3d, features.MAs.MA_7d, features.MAs.MA_14d, features.MAs.MA_21d,  features.close]
 
             features = torch.from_numpy(np.stack(features, axis=0)).unsqueeze(0).float().to(device)
 
             with torch.no_grad():
                 best_out = stock_net(features).item()
+
+        if train_loss < best_loss:
+            count = 0
+
+        if count >= args.early_stop:
+            break
 
         
         error_log(train_loss, test_loss, epoch, best_out)
@@ -58,13 +67,14 @@ def train(args, train_loader, stock_net, optimizer, criterion):
 
         high_low_diffs = features.high_low_diff
         close_open_diffs = features.close_open_diff
+        MA_3d = features.MAs.MA_3d
         MA_7d = features.MAs.MA_7d
         MA_14d = features.MAs.MA_14d
         MA_21d = features.MAs.MA_21d
         std = features.std
         close = features.close
 
-        input = torch.stack((high_low_diffs, close_open_diffs, std, MA_7d, MA_14d, MA_21d, close)).float().to(device)
+        input = torch.stack((high_low_diffs, close_open_diffs, std, MA_3d, MA_7d, MA_14d, MA_21d, close)).float().to(device)
         input = torch.transpose(input, 0, 1)
 
 
@@ -92,13 +102,14 @@ def test(args, test_loader, stock_net, criterion):
 
             high_low_diffs = features.high_low_diff
             close_open_diffs = features.close_open_diff
+            MA_3d = features.MAs.MA_3d
             MA_7d = features.MAs.MA_7d
             MA_14d = features.MAs.MA_14d
             MA_21d = features.MAs.MA_21d
             std = features.std
             close = features.close
 
-            input = torch.stack((high_low_diffs, close_open_diffs, std, MA_7d, MA_14d, MA_21d, close)).float().to(device)
+            input = torch.stack((high_low_diffs, close_open_diffs, std, MA_3d, MA_7d, MA_14d, MA_21d, close)).float().to(device)
             input = torch.transpose(input, 0, 1)
             output = stock_net(input).flatten()
 
@@ -128,7 +139,7 @@ if __name__ == '__main__':
     # stock related arguments
     parser.add_argument('--ticker', '-t', type=str, help='The ticker of company', default='NKE')
     parser.add_argument('--interval', '-i', type=str, help='https://github.com/ranaroussi/yfinance/wiki/Ticker', default='1d')
-    parser.add_argument('--MA_intervals', '-m', nargs='+',help='list of intervals of moving average(unit: day)', default=[7, 14, 21])
+    parser.add_argument('--MA_intervals', '-m', nargs='+',help='list of intervals of moving average(unit: day)', default=[3, 7, 14, 21])
     parser.add_argument('--std_interval', '-s', help='interval of std(unit: day)', type=int, default=7)
     parser.add_argument('--download','-d', action='store_true')
     parser.add_argument('--drop_head', help='drop the first drop_head rows of the csv file, since there are no value of MA and std for the first couple of days', type=int, default=21)
@@ -141,10 +152,11 @@ if __name__ == '__main__':
     # training related arguments
     parser.add_argument('--batch_size', '-b', type=int, default=64)
     parser.add_argument('--epochs', '-e', type=int, default=1000)
-    parser.add_argument('--in_features', type=int, default=7)
+    parser.add_argument('--in_features', type=int, default=8)
     parser.add_argument('--out_features', type=int, default=1)
     parser.add_argument('--lr', type=float, default=1e-3)
     parser.add_argument('--weight_decay', type=float, default=1e-4)
+    parser.add_argument('--early_stop', type=int, default=100)
 
     args = parser.parse_args()
     args.MA_intervals = [int(interval) for interval in args.MA_intervals]
