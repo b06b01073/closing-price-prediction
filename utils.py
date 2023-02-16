@@ -4,8 +4,15 @@ import os
 
 def get_dataset(ticker):
     path = get_path(f'./data/{ticker}.csv')
-    data = pd.read_csv(path) if os.path.exists(path) else yf.download(tickers=ticker, period='5y', interval='1d')
-    data.to_csv(path)
+
+    if os.path.exists(path):
+        dataset = pd.read_csv(path)
+    else:
+        dataset = yf.download(tickers=ticker, period='5y', interval='1d')
+        dataset.to_csv(path, index=False)    
+
+    return dataset
+
 
 
 def get_path(path):
