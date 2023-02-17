@@ -37,7 +37,7 @@ def plot(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--model', type=str, default='./model_params/NKE.pth')
-    parser.add_argument('--ticker', type=str, default='NKE')
+    parser.add_argument('--ticker', '-t', type=str, default='NKE')
     parser.add_argument('--start', type=str, default='2022-01-01')
     parser.add_argument('--end', type=str, default='2023-02-17')
     parser.add_argument('--interval', '-i', type=str, help='https://github.com/ranaroussi/yfinance/wiki/Ticker', default='1d')

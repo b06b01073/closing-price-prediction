@@ -1,6 +1,3 @@
 __pycache__
 data/
 predict.py
-*.png
-model_params/*
-result/*
