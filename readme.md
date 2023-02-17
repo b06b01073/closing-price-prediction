@@ -58,6 +58,8 @@ The 11 input features are:
 |Apple|3.25|1.72%|
 |Amazon|3.96|2.48%|
 
+It is by no means a outstanding result in my opinion, but the fact that the model does have the capability to caputure trend with such an simple network is quite suprising.
+
 ### 0050
 <p align="center">
   <img src="./result/0050.TW.png">
