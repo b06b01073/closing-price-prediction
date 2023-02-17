@@ -7,7 +7,6 @@ from torch import optim
 from torch import nn 
 import numpy as np
 
-import matplotlib.pyplot as plt
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
@@ -101,16 +100,6 @@ def test(args, test_loader, stock_net, criterion):
                 predictions.append(prediction.item())
             for truth in y:
                 ground_truths.append(truth.to('cpu'))
-
-    x = [i for i in range(len(predictions))]
-    plt.plot(x, predictions, color='blue', label='pred')
-    plt.plot(x, ground_truths, color='red', label='ground truth')
-    plt.legend(loc='best')
-    plt.ylabel('price')
-    plt.xlabel(f'trading day since {args.test_start}')
-    plt.title(args.ticker)
-    plt.savefig(f'./result/{args.ticker}.png')
-    plt.clf()
 
     return total_loss, output
 

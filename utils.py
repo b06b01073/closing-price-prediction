@@ -2,6 +2,7 @@ import yfinance as yf
 import pandas as pd
 import os
 from dataset import StockDataset
+import matplotlib.pyplot as plt
 
 def get_dataset(ticker, interval, MA_intervals, std_interval, download, drop_head, start, end, train_set):
     dataset_type = 'train' if train_set else 'test'
@@ -36,3 +37,13 @@ def get_path(path):
     dir_path = os.path.dirname(__file__) 
     path = os.path.join(dir_path, path)
     return path
+
+def save_plot(start, ticker, predictions, labels):
+    x = [i for i in range(len(predictions))]
+    plt.plot(x, predictions, color='blue', label='pred')
+    plt.plot(x, labels, color='red', label='ground truth')
+    plt.legend(loc='best')
+    plt.ylabel('price')
+    plt.xlabel(f'trading day since {start}')
+    plt.title(ticker)
+    plt.savefig(f'./result/{ticker}.png')
