@@ -46,10 +46,10 @@ def main(args):
             break
 
         
-        error_log(train_loss / len(train_loader), test_loss / len(test_loader), epoch, best_out)
+        error_log(train_loss / len(train_loader), test_loss / len(test_loader), epoch)
 
-def error_log(train_loss, test_loss, epoch, best_out):
-    print(f'epoch: {epoch}, train_loss: {train_loss}, test_loss: {test_loss}, best_out: {best_out}')
+def error_log(train_loss, test_loss, epoch):
+    print(f'epoch: {epoch}, train_loss: {train_loss}, test_loss: {test_loss}')
 
 def train(args, train_loader, stock_net, optimizer, criterion):
     total_loss = 0
