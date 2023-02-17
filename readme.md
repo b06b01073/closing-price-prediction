@@ -10,9 +10,9 @@ The dataset are
 |-----|-------------|--------------|
 |Time Interval | 01/01/2011 - 12/31/2021| 01/01/2022 - 02/17/2023|
 
-note that the first 14 days of training set and testing set are dropped since there are no 14 days MA data.
+Note that the first 13 days of both training set and testing set are dropped since there are no 14 days MA data.
 
-The data source is collected from yahoo finance by yfinance.
+The data is collected from yahoo finance by yfinance.
 
 ## Model 
 An simple network architecture is listed below:
@@ -42,7 +42,7 @@ Estimated Total Size (MB): 1.10
 
 The 11 input features are:
 * Variables mentioned in [1] (6 in total)
-* OHLC of previos day (4 in total)
+* OHLC of previous day (4 in total)
 * 3 days MA
 
 
