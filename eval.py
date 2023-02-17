@@ -33,6 +33,8 @@ def plot(args):
                 labels.append(truth.to('cpu'))
 
     utils.save_plot(args.start, args.ticker, predictions, labels)
+    rmse, mape = utils.eval(predictions, labels)
+    print(rmse, mape)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

@@ -3,6 +3,7 @@ import pandas as pd
 import os
 from dataset import StockDataset
 import matplotlib.pyplot as plt
+import numpy as np
 
 def get_dataset(ticker, interval, MA_intervals, std_interval, download, drop_head, start, end, train_set):
     dataset_type = 'train' if train_set else 'test'
@@ -47,3 +48,10 @@ def save_plot(start, ticker, predictions, labels):
     plt.xlabel(f'trading day since {start}')
     plt.title(ticker)
     plt.savefig(f'./result/{ticker}.png')
+
+def eval(predictions, labels):
+    predictions = np.array(predictions)
+    labels = np.array(labels)
+    rmse = np.sqrt(np.mean(labels - predictions) ** 2)
+    mape = np.mean(np.divide(np.abs(labels - predictions), labels)) * 100 # in percentage
+    return rmse, mape

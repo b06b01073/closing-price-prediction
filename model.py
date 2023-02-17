@@ -1,4 +1,6 @@
 from torch import nn
+from torchsummary import summary
+import torch
 
 class StockNet(nn.Module):
     def __init__(self, in_features, out_features):
@@ -17,3 +19,7 @@ class StockNet(nn.Module):
 
     def forward(self, x):
         return self.net(x)
+
+if __name__ == '__main__':
+    stock_net = StockNet(in_features=11, out_features=1).to('cuda')
+    summary(stock_net, (11,))
