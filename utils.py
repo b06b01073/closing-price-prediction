@@ -52,6 +52,6 @@ def save_plot(start, ticker, predictions, labels):
 def eval(predictions, labels):
     predictions = np.array(predictions)
     labels = np.array(labels)
-    rmse = np.sqrt(np.mean(labels - predictions) ** 2)
+    rmse = np.sqrt(np.mean((labels - predictions) ** 2))
     mape = np.mean(np.divide(np.abs(labels - predictions), labels)) * 100 # in percentage
     return rmse, mape

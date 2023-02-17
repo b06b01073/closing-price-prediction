@@ -52,25 +52,11 @@ The 11 input features are:
 ### RMSE and MAPE
 |Company or Index|RMSE|MAPE|
 |------|-----|----|
-|S&P 500|0.84|1.19%|
-|S&P 100|0.22|1.23%|
-|0050|0.005|1.09%|
-|Nike|0.01|1.93%|
-|Boeing|0.23|2.12%|
-|Apple|0.14|1.72%|
-|Amazon|0.15|2.48%|
-
-
-
-### S&P 500
-<p align="center">
-  <img src="./result/^GSPC.png">
-</p>
-
-### S&P 100
-<p align="center">
-  <img src="./result/^OEX.png">
-</p>
+|0050|1.67|1.09%|
+|Nike|2.89|1.93%|
+|Boeing|4.53|2.12%|
+|Apple|3.25|1.72%|
+|Amazon|3.96|2.48%|
 
 ### 0050
 <p align="center">

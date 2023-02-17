@@ -27,7 +27,6 @@ def main(args):
 
     best_train_loss = float('inf')
     best_test_loss = float('inf')
-    best_out = None
     count = 0
     for epoch in range(args.epochs):
         train_loss = train(args, train_loader, stock_net, optimizer, criterion)
@@ -38,14 +37,6 @@ def main(args):
         if test_loss < best_test_loss:
             best_test_loss = test_loss
             torch.save(stock_net.state_dict(), utils.get_path(f'./model_params/{args.ticker}.pth'))
-
-            features = test_set.fetch_data(-2)
-            features = [features.open, features.high, features.low, features.close, features.high_low_diff, features.close_open_diff, features.std, features.MAs.MA_3d, features.MAs.MA_7d, features.MAs.MA_14d, features.MAs.MA_21d]
-
-            features = torch.from_numpy(np.stack(features, axis=0)).unsqueeze(0).float().to(device)
-
-            with torch.no_grad():
-                best_out = stock_net(features).item()
 
         if train_loss < best_train_loss:
             best_train_loss = train_loss
