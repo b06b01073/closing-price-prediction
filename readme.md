@@ -15,7 +15,7 @@ Note that the first 13 days of both training set and testing set are dropped sin
 The data is collected from yahoo finance by yfinance.
 
 ## Model 
-An simple network architecture is listed below:
+A simple network architecture is listed below:
 ```
 ----------------------------------------------------------------
         Layer (type)               Output Shape         Param #
