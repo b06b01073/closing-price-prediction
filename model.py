@@ -6,13 +6,13 @@ class StockNet(nn.Module):
 
 
         self.net =  nn.Sequential(
-            nn.Linear(in_features, 512),
+            nn.Linear(in_features, 1024),
             nn.ReLU(),
-            nn.Linear(512, 256),
+            nn.Linear(1024, 256),
             nn.ReLU(),
-            nn.Linear(256, 64),
+            nn.Linear(256, 32),
             nn.ReLU(),
-            nn.Linear(64, out_features),
+            nn.Linear(32, out_features),
         )
 
     def forward(self, x):

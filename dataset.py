@@ -15,7 +15,7 @@ class StockDataset(Dataset):
     def fetch_data(self, index):
         row = self.dataset.iloc[index]
 
-        StockData = namedtuple('StockData', ['high_low_diff', 'close_open_diff', 'MAs', 'std', 'volume', 'close'])
+        StockData = namedtuple('StockData', ['high_low_diff', 'close_open_diff', 'MAs', 'std', 'volume', 'open','high', 'low', 'close'])
 
         MAs_cols = [f'MA_{interval}d'for interval in self.MA_intervals]
         MAs = namedtuple('MAs', MAs_cols)
@@ -28,12 +28,16 @@ class StockDataset(Dataset):
             MAs = moving_averages,
             std = row[f'std_{self.std_interval}d'],
             volume=row['Volume'],
-            close=self.dataset.iloc[index]['Close']
+            open = row['Open'],
+            high = row['High'], 
+            low = row['Low'],
+            close = row['Close'],
         )
 
         return stock_data
 
     def __len__(self):
+        # dataset的最後一筆資料為前一天的資料
         return len(self.dataset.index) - 1
 
     def __getitem__(self, index):
