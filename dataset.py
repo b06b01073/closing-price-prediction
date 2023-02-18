@@ -15,7 +15,7 @@ class StockDataset(Dataset):
     def fetch_data(self, index):
         row = self.dataset.iloc[index]
 
-        StockData = namedtuple('StockData', ['high_low_diff', 'close_open_diff', 'MAs', 'std', 'volume', 'open','high', 'low', 'close'])
+        StockData = namedtuple('StockData', ['high_low_diff', 'close_open_diff', 'MAs', 'std', 'volume', 'open','high', 'low', 'close', 'next_open', 'volume_ratio'])
 
         MAs_cols = [f'MA_{interval}d'for interval in self.MA_intervals]
         MAs = namedtuple('MAs', MAs_cols)
@@ -23,8 +23,8 @@ class StockDataset(Dataset):
 
 
         stock_data = StockData(
-            high_low_diff = row['High'] - row['Low'],
-            close_open_diff = row['Close'] - row['Open'],
+            high_low_diff = (row['High'] - row['Low']),
+            close_open_diff = (row['Close'] - row['Open']),
             MAs = moving_averages,
             std = row[f'std_{self.std_interval}d'],
             volume=row['Volume'],
@@ -32,6 +32,8 @@ class StockDataset(Dataset):
             high = row['High'], 
             low = row['Low'],
             close = row['Close'],
+            next_open = self.dataset.iloc[index + 1]['Open'],
+            volume_ratio=row['volume_ratio']
         )
 
         return stock_data

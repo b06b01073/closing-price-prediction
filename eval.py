@@ -10,6 +10,8 @@ def plot(args):
     test_set = utils.get_dataset(ticker=args.ticker, interval=args.interval, MA_intervals=args.MA_intervals, std_interval=args.std_interval, download=args.download, drop_head=args.drop_head, start=args.start, end=args.end, train_set=False)
     test_loader = DataLoader(test_set, batch_size=args.batch_size)
 
+    print(len(test_set))
+
     stock_net = model.StockNet(in_features=args.in_features, out_features=args.out_features).to(device)
 
     stock_net.load_state_dict(torch.load(args.model))
@@ -22,7 +24,7 @@ def plot(args):
             features, y = batch
             y = y.float().to(device)
 
-            input = torch.stack((features.open, features.high, features.low, features.close,  features.high_low_diff, features.close_open_diff, features.std, features.MAs.MA_3d, features.MAs.MA_7d, features.MAs.MA_14d, features.MAs.MA_21d)).float().to(device)
+            input = torch.stack((features.open, features.high, features.low, features.close, features.next_open, features.high_low_diff, features.close_open_diff, features.std, features.MAs.MA_3d, features.MAs.MA_7d, features.MAs.MA_14d, features.MAs.MA_21d, features.volume_ratio)).float().to(device)
             input = torch.transpose(input, 0, 1)
             output = stock_net(input).flatten()
 
@@ -31,6 +33,8 @@ def plot(args):
                 predictions.append(prediction.item())
             for truth in y:
                 labels.append(truth.to('cpu'))
+
+    print(predictions, labels)
 
     utils.save_plot(args.start, args.ticker, predictions, labels)
     rmse, mape = utils.eval(predictions, labels)
@@ -49,7 +53,7 @@ if __name__ == '__main__':
     parser.add_argument('--drop_head', help='drop the first drop_head rows of the csv file, since there are no value of MA and std for the first couple of days', type=int, default=21)
 
     parser.add_argument('--batch_size', '-b', type=int, default=64)
-    parser.add_argument('--in_features', type=int, default=11)
+    parser.add_argument('--in_features', type=int, default=13)
     parser.add_argument('--out_features', type=int, default=1)
 
     args = parser.parse_args()

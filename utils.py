@@ -16,13 +16,15 @@ def get_dataset(ticker, interval, MA_intervals, std_interval, download, drop_hea
         dataset = yf.download(tickers=ticker, start=start, end=end, interval=interval)
         insert_MAs(dataset, MA_intervals)
         insert_std(dataset, std_interval)
+        insert_volume_ratio(dataset)
         dataset.to_csv(path)    
 
     dataset = dataset.iloc[drop_head-1:] 
+    return StockDataset(dataset, MA_intervals, std_interval, train_set)
 
-    dataset = StockDataset(dataset, MA_intervals, std_interval, train_set)
-
-    return dataset
+def insert_volume_ratio(dataset):
+    dataset['mean_volume'] = dataset['Volume'].expanding().mean()
+    dataset['volume_ratio'] = dataset['Volume'] / dataset['mean_volume']
 
 def insert_MAs(dataset, MA_intervals):
     for interval in MA_intervals:
