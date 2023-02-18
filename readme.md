@@ -15,7 +15,7 @@ Note that the first 13 days of both training set and testing set are dropped sin
 The data is collected from yahoo finance by yfinance.
 
 ## Model 
-An simple network architecture is listed below:
+A simple network architecture is listed below:
 ```
 ----------------------------------------------------------------
         Layer (type)               Output Shape         Param #
@@ -59,6 +59,8 @@ The 13 input features are:
 |Boeing|3.45|1.58%|
 |Apple|2.73|1.46%|
 |Amazon|2.87|1.92%|
+
+It is by no means an outstanding result in my opinion, but the fact that the model does have the capability to caputure trend with such an simple network is quite suprising.
 
 ### 0050
 <p align="center">
