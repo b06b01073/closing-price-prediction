@@ -40,10 +40,12 @@ Estimated Total Size (MB): 1.10
 
 ```
 
-The 11 input features are:
+The 13 input features are:
 * Variables mentioned in [1] (6 in total)
 * OHLC of previous day (4 in total)
 * 3 days MA
+* Volume ratio(volume of previous day / rolling average volume from the first day)
+* Open price of current day
 
 
 
@@ -52,11 +54,11 @@ The 11 input features are:
 ### RMSE and MAPE
 |Company or Index|RMSE|MAPE|
 |------|-----|----|
-|0050|1.67|1.09%|
-|Nike|2.89|1.93%|
-|Boeing|4.53|2.12%|
-|Apple|3.25|1.72%|
-|Amazon|3.96|2.48%|
+|0050|1.11|0.71%|
+|Nike|1.75|1.32%|
+|Boeing|3.45|1.58%|
+|Apple|2.73|1.46%|
+|Amazon|2.87|1.92%|
 
 ### 0050
 <p align="center">
