@@ -87,6 +87,9 @@ It is by no means an outstanding result in my opinion, but the fact that the mod
   <img src="./result/NKE.png">
 </p>
 
+## DISCLAIMER:
+
+The information provided by this code is for educational and informational purposes only. It is not intended to provide investment advice and should not be relied upon as such. The user of this code acknowledges that any investment involves a high degree of risk, including the risk of losing money. The code should not be used as a sole basis for investment decisions.
 
 ## Reference
 
