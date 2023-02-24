@@ -9,11 +9,11 @@ class StockNet(nn.Module):
 
         self.net =  nn.Sequential(
             nn.Linear(in_features, 1024),
-            nn.ReLU(),
+            nn.LeakyReLU(),
             nn.Linear(1024, 512),
-            nn.ReLU(),
+            nn.LeakyReLU(),
             nn.Linear(512, 128),
-            nn.ReLU(),
+            nn.LeakyReLU(),
             nn.Linear(128, out_features),
         )
 

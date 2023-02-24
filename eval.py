@@ -34,7 +34,6 @@ def plot(args):
             for truth in y:
                 labels.append(truth.to('cpu'))
 
-    print(predictions, labels)
 
     utils.save_plot(args.start, args.ticker, predictions, labels)
     rmse, mape = utils.eval(predictions, labels)

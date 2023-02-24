@@ -45,7 +45,7 @@ def main(args):
         if count >= args.early_stop:
             break
 
-        print(f'epoch: {epoch}\ntrain_loss: {train_loss / len(train_loader)}, train_rmse: {train_rmse}, train_mape: {train_mape}\ntest_loss: {test_loss / len(test_loader)}, test_rmse: {test_rmse}, test_mape: {test_mape}\n')        
+        print(f'epoch: {epoch}\ntrain_loss: {train_loss / len(train_set)}, train_rmse: {train_rmse}, train_mape: {train_mape}\ntest_loss: {test_loss / len(test_set)}, test_rmse: {test_rmse}, test_mape: {test_mape}\n')        
 
     
 
@@ -123,12 +123,12 @@ if __name__ == '__main__':
 
 
     # training related arguments
-    parser.add_argument('--batch_size', '-b', type=int, default=64)
+    parser.add_argument('--batch_size', '-b', type=int, default=32)
     parser.add_argument('--epochs', '-e', type=int, default=1000)
     parser.add_argument('--in_features', type=int, default=13)
     parser.add_argument('--out_features', type=int, default=1)
     parser.add_argument('--lr', type=float, default=1e-5)
-    parser.add_argument('--weight_decay', type=float, default=1e-3)
+    parser.add_argument('--weight_decay', type=float, default=1e-4)
     parser.add_argument('--early_stop', type=int, default=100)
 
     args = parser.parse_args()

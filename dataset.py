@@ -23,11 +23,11 @@ class StockDataset(Dataset):
 
 
         stock_data = StockData(
-            high_low_diff = (row['High'] - row['Low']),
-            close_open_diff = (row['Close'] - row['Open']),
+            high_low_diff = (row['High'] - row['Low']) / row['Low'],
+            close_open_diff = (row['Close'] - row['Open']) / row['Open'],
             MAs = moving_averages,
             std = row[f'std_{self.std_interval}d'],
-            volume=row['Volume'],
+            volume = row['Volume'],
             open = row['Open'],
             high = row['High'], 
             low = row['Low'],
