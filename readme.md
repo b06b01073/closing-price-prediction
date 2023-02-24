@@ -20,24 +20,23 @@ A simple network architecture is listed below:
 ----------------------------------------------------------------
         Layer (type)               Output Shape         Param #
 ================================================================
-            Linear-1                 [-1, 1024]          12,288
-              ReLU-2                 [-1, 1024]               0
-            Linear-3                  [-1, 256]         262,400
-              ReLU-4                  [-1, 256]               0
-            Linear-5                   [-1, 32]           8,224
-              ReLU-6                   [-1, 32]               0
-            Linear-7                    [-1, 1]              33
+            Linear-1                 [-1, 1024]          14,336
+         LeakyReLU-2                 [-1, 1024]               0
+            Linear-3                  [-1, 512]         524,800
+         LeakyReLU-4                  [-1, 512]               0
+            Linear-5                  [-1, 128]          65,664
+         LeakyReLU-6                  [-1, 128]               0
+            Linear-7                    [-1, 1]             129
 ================================================================
-Total params: 282,945
-Trainable params: 282,945
+Total params: 604,929
+Trainable params: 604,929
 Non-trainable params: 0
 ----------------------------------------------------------------
 Input size (MB): 0.00
-Forward/backward pass size (MB): 0.02
-Params size (MB): 1.08
-Estimated Total Size (MB): 1.10
+Forward/backward pass size (MB): 0.03
+Params size (MB): 2.31
+Estimated Total Size (MB): 2.33
 ----------------------------------------------------------------
-
 ```
 
 The 13 input features are:

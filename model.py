@@ -21,5 +21,5 @@ class StockNet(nn.Module):
         return self.net(x)
 
 if __name__ == '__main__':
-    stock_net = StockNet(in_features=12, out_features=1).to('cuda')
-    summary(stock_net, (11,))
+    stock_net = StockNet(in_features=13, out_features=1).to('cuda')
+    summary(stock_net, (13,))
